@@ -1,0 +1,36 @@
+
+<div class="container p-5 ">
+    <div class="wrapper fadeInDown p-5">
+        <div id="formContent">
+          <!-- Tabs Titles -->
+          <h2  class="active"> Sign In </h2>
+          <a  routerLink="/user/user-registration">
+            <h2 class="inactive underlineHover">Sign Up</h2>
+          </a>
+      
+          <!-- Icon -->
+          <div class="fadeIn first">
+            <p class="text-success">Welcome back!</p>
+          </div>
+      
+          <!-- Login Form -->
+          <form [formGroup]="userLoginData" (ngSubmit)="userLogin()">
+            <input type="email" id="login" class="fadeIn second" name="email" placeholder="Email"  formControlName="username">
+            <div *ngIf="userLoginData.get('username')?.invalid && (userLoginData.get('username')?.dirty || userLoginData.get('username')?.touched)" class="small text-danger">
+              This is required field
+            </div>
+            <input type="password" id="password" class="fadeIn third" name="password" placeholder="Password"formControlName="password" autocomplete="disabled">
+            <div *ngIf="userLoginData.get('password')?.invalid && (userLoginData.get('password')?.dirty || userLoginData.get('password')?.touched)" class="small text-danger">
+              This is required field
+            </div>
+            <input type="submit" class="fadeIn fourth" value="Log In">
+          </form>
+      
+          <!-- Remind Passowrd -->
+          <div id="formFooter">
+            
+          </div>
+      
+        </div>
+      </div>
+  </div>

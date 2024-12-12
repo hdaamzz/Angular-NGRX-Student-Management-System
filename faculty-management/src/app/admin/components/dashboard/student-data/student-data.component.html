@@ -1,0 +1,296 @@
+<div class="container-fluid p-5">
+
+    <!-- first row -->
+    <div class="row text-center text-success">
+        <div class="col-md-6">
+            <a href="" style="text-decoration: none;" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
+                <div class="card shadow custom-hover-effect">
+                    <div class="card-body">
+                        <h6>Add Student</h6>
+                        <p>+</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-6">
+            <a href="" style="text-decoration: none;">
+                <div class="card shadow">
+                    <div class="card-body">
+                        <h6>Total Students</h6>
+                        <p>{{noOfStudents}}</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+    </div>
+
+    <!-- second row -->
+
+    <div class="row pe-2 mt-3">
+        <div class="col-sm-12 text-center">
+            <div class="card shadow">
+                <div class="card-body text-center">
+                    <h4 class="text-success">LIST OF STUDENTS</h4>
+                    <div class="table-responsive my-3">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th scope="col">ID</th>
+                                    <th scope="col">Name</th>
+                                    <th scope="col">Email</th>
+                                    <th scope="col">Mobile</th>
+                                    <th scope="col">Department</th>
+                                    <th scope="col">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let student of allFaculties">
+                                    <td>{{ student.faculty_number }}</td>
+                                    <td>{{ student.faculty_name }}</td>
+                                    <td>{{ student.email }}</td>
+                                    <td>{{ student.mobile }}</td>
+                                    <td>{{ student.department }}</td>
+                                    <td>
+                                        <button type="button" class="btn btn-outline-secondary me-2"
+                                            (click)="getFaculty(student)" data-bs-toggle="modal"
+                                            data-bs-target="#viewModal">
+                                            View
+                                        </button>
+                                        <button type="button" class="btn btn-outline-primary me-2"
+                                            (click)="getFaculty(student)" data-bs-toggle="modal"
+                                            data-bs-target="#editModal">
+                                            Edit
+                                        </button>
+                                        <button type="button" class="btn btn-outline-danger"
+                                            (click)="deleteFaculty(student)">
+                                            Delete
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- add student -->
+    <div  class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+        aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5 text-success" id="staticBackdropLabel">Add Student</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form [formGroup]="studentDetailsForm" (ngSubmit)="addNewFaculty()">
+
+                        <!-- Full Name -->
+                        <div class="mb-3">
+                            <label for="fullname" class="form-label">Full Name</label>
+                            <input type="text" class="form-control" id="fullname" formControlName="faculty_name">
+                            <div *ngIf="studentDetailsForm.get('faculty_name')?.invalid && studentDetailsForm.get('faculty_name')?.touched"
+                                class="small text-danger">
+                                Name is required.
+                            </div>
+                        </div>
+
+                        <!-- Email -->
+                        <div class="mb-3">
+                            <label for="emailaddress" class="form-label">Email Address</label>
+                            <input type="email" class="form-control" id="emailaddress" formControlName="email">
+                            <div *ngIf="studentDetailsForm.get('email')?.invalid && studentDetailsForm.get('email')?.touched"
+                                class="small text-danger">
+                                Enter a valid email address.
+                            </div>
+                        </div>
+
+                        <!-- Joining Year -->
+                        <div class="mb-3">
+                            <label for="joiningdate" class="form-label">Joining Year</label>
+                            <input type="number" class="form-control" id="joiningdate" formControlName="joining_year">
+                            <div *ngIf="studentDetailsForm.get('joining_year')?.invalid && studentDetailsForm.get('joining_year')?.touched"
+                                class="small text-danger">
+                                Joining year is required and must be valid.
+                            </div>
+                        </div>
+
+                        <!-- Department -->
+                        <div class="mb-3">
+                            <label for="department" class="form-label">Department</label>
+                            <input type="text" class="form-control" id="department" formControlName="department">
+                            <div *ngIf="studentDetailsForm.get('department')?.invalid && studentDetailsForm.get('department')?.touched"
+                                class="small text-danger">
+                                Department is required.
+                            </div>
+                        </div>
+
+                        <!-- Date of Birth -->
+                        <div class="mb-3">
+                            <label for="dateofbirth" class="form-label">Date of Birth</label>
+                            <input type="date" class="form-control" id="dateofbirth" formControlName="birth_date">
+                            <div *ngIf="studentDetailsForm.get('birth_date')?.invalid && studentDetailsForm.get('birth_date')?.touched"
+                                class="small text-danger">
+                                Date of birth is required.
+                            </div>
+                        </div>
+
+                        <!-- Mobile -->
+                        <div class="mb-3">
+                            <label for="mobile" class="form-label">Mobile</label>
+                            <input type="text" class="form-control" id="mobile" formControlName="mobile">
+                            <div *ngIf="studentDetailsForm.get('mobile')?.invalid && studentDetailsForm.get('mobile')?.touched"
+                                class="small text-danger">
+                                Enter a valid mobile number (10-13 digits).
+                            </div>
+                        </div>
+
+                        <!-- Password -->
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Password</label>
+                            <input type="password" class="form-control" id="password" formControlName="password" autocomplete="disabled">
+                            <div *ngIf="studentDetailsForm.get('password')?.invalid && studentDetailsForm.get('password')?.touched"
+                                class="small text-danger">
+                                Password is required (minimum 8 characters).
+                            </div>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <button type="submit" class="btn btn-primary">Add Student</button>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- view student -->
+
+
+    <!-- Modal -->
+    <div class="modal fade" id="viewModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title text-success" id="exampleModalLabel">Student Details</h5>
+                </div>
+                <div class="modal-body">
+                    <table class="table table-hover">
+                        <tr>
+                            <td scope="row"><b> Name</b></td>
+                            <td>{{studentDetailsForm.get('faculty_name')?.value}}</td>
+                        </tr>
+                        <tr>
+                            <td scope="row"><b> Email</b></td>
+                            <td>{{studentDetailsForm.get('email')?.value}}</td>
+                        </tr>
+                        <tr>
+                            <td scope="row"><b> Department</b></td>
+                            <td>{{studentDetailsForm.get('department')?.value}}</td>
+                        </tr>
+                        <tr>
+                            <td scope="row"><b> Joined-Date</b></td>
+                            <td>{{studentDetailsForm.get('joining_year')?.value}}</td>
+                        </tr>
+                        <tr>
+                            <td scope="row"><b> DOB</b></td>
+                            <td>{{studentDetailsForm.get('birth_date')?.value}}</td>
+                        </tr>
+                        <tr>
+                            <td scope="row"><b> Mobile Number</b></td>
+                            <td>{{studentDetailsForm.get('mobile')?.value}}</td>
+                        </tr>
+
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- edit student -->
+<div class="modal fade" id="editModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+    aria-labelledby="editModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5 text-success" id="editModalLabel">Edit Student</h1>
+                <button (click)="resetForm()" type="button" class="btn-close" data-bs-dismiss="modal"
+                    aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form [formGroup]="studentDetailsForm" (ngSubmit)="updateFaculty()">
+
+                    <div class="mb-3">
+                        <label for="edit-fullname" class="form-label">Full Name</label>
+                        <input type="text" class="form-control" id="edit-fullname" formControlName="faculty_name">
+                        <div *ngIf="studentDetailsForm.get('faculty_name')?.invalid && (studentDetailsForm.get('faculty_name')?.dirty || studentDetailsForm.get('faculty_name')?.touched)"
+                            class="small text-danger">
+                            The Name field is required
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="edit-emailaddress" class="form-label">Email address</label>
+                        <input type="email" class="form-control" id="edit-emailaddress" formControlName="email">
+                        <div *ngIf="studentDetailsForm.get('email')?.invalid && (studentDetailsForm.get('email')?.dirty || studentDetailsForm.get('email')?.touched)"
+                            class="small text-danger">
+                            Enter a proper email
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="edit-joiningdate" class="form-label">Joining Year</label>
+                        <input type="number" class="form-control" id="edit-joiningdate" formControlName="joining_year">
+                        <div *ngIf="studentDetailsForm.get('joining_year')?.invalid && (studentDetailsForm.get('joining_year')?.dirty || studentDetailsForm.get('joining_year')?.touched)"
+                            class="small text-danger">
+                            This is a required field
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="edit-department" class="form-label">Department</label>
+                        <input type="text" class="form-control" id="edit-department" formControlName="department">
+                        <div *ngIf="studentDetailsForm.get('department')?.invalid && (studentDetailsForm.get('department')?.dirty || studentDetailsForm.get('department')?.touched)"
+                            class="small text-danger">
+                            This is a required field
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="edit-dateofbirth" class="form-label">Date of Birth</label>
+                        <input type="date" class="form-control" id="edit-dateofbirth" formControlName="birth_date">
+                        <div *ngIf="studentDetailsForm.get('birth_date')?.invalid && (studentDetailsForm.get('birth_date')?.dirty || studentDetailsForm.get('birth_date')?.touched)"
+                            class="small text-danger">
+                            This is a required field
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="edit-mobile" class="form-label">Mobile</label>
+                        <input type="text" class="form-control" id="edit-mobile" formControlName="mobile">
+                        <div *ngIf="studentDetailsForm.get('mobile')?.hasError('pattern') && studentDetailsForm.get('mobile')?.touched"
+                            class="small text-danger">
+                            Enter a valid mobile number (10-13 digits).
+                        </div>
+                    </div>
+
+
+
+                    <button type="submit" class="btn btn-primary" [disabled]="studentDetailsForm.invalid">Update
+                        Student</button>
+
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

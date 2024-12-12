@@ -1,0 +1,62 @@
+<div class="container p-5">
+    <div class="wrapper fadeInDown p-5">
+        <div id="formContent">
+            <!-- Tabs Titles -->
+            <a routerLink="/user/user-login">
+                <h2 class="inactive underlineHover">Sign In</h2>
+            </a>
+            
+            <h2 class="active">Sign Up</h2>
+
+            <!-- Icon -->
+            <div class="fadeIn first p-3"></div>
+
+            <!-- Registration Form -->
+            <form [formGroup]="studentDetailsForm" (ngSubmit)="addNewFaculty()">
+                
+                <input type="text" id="faculty_name" class="fadeIn second" name="faculty_name" placeholder="Your Name"  formControlName="faculty_name">
+                <div *ngIf="studentDetailsForm.get('faculty_name')?.invalid && studentDetailsForm.get('faculty_name')?.touched"
+                class="small text-danger">
+                Name is required.
+            </div>
+                <input type="email" id="email" class="fadeIn second" name="email" placeholder="Email" formControlName="email">
+                <div *ngIf="studentDetailsForm.get('email')?.invalid && studentDetailsForm.get('email')?.touched"
+                                class="small text-danger">
+                                Enter a valid email address.
+                            </div>
+                <input type="number" id="joining_year" class="fadeIn second" name="joining_year" placeholder="Joining Year" formControlName="joining_year">
+                <div *ngIf="studentDetailsForm.get('joining_year')?.invalid && studentDetailsForm.get('joining_year')?.touched"
+                class="small text-danger">
+                Joining year is required and must be valid.
+            </div>
+                <input type="date" id="birth_date" class="fadeIn second" name="birth_date" placeholder="Birth Date" formControlName="birth_date">
+                <div *ngIf="studentDetailsForm.get('birth_date')?.invalid && studentDetailsForm.get('birth_date')?.touched"
+                class="small text-danger">
+                Date of birth is required.
+            </div>
+                <input type="text" id="department" class="fadeIn second" name="department" placeholder="Department" formControlName="department">
+                <div *ngIf="studentDetailsForm.get('department')?.invalid && studentDetailsForm.get('department')?.touched"
+                class="small text-danger">
+                Department is required.
+            </div>
+                <input type="number" id="mobile" class="fadeIn second" name="mobile" placeholder="Mobile" formControlName="mobile">
+                <div *ngIf="studentDetailsForm.get('mobile')?.invalid && studentDetailsForm.get('mobile')?.touched"
+                class="small text-danger">
+                Enter a valid mobile number (10-13 digits).
+            </div>
+                <input type="password" id="password" class="fadeIn second" name="password" placeholder="Password" formControlName="password" autocomplete="disabled">
+                <div *ngIf="studentDetailsForm.get('password')?.invalid && studentDetailsForm.get('password')?.touched"
+                class="small text-danger">
+                Password is required (minimum 8 characters).
+            </div>
+                <!-- <input type="password" id="confirm-password" class="fadeIn second" name="re-password" placeholder="Confirm Password" autocomplete="disabled"> -->
+                
+                
+                <input type="submit" class="fadeIn fourth" value="Sign Up">
+            </form>
+
+            <!-- Footer -->
+            <div id="formFooter"></div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,176 @@
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Student } from '../../../../model/student';
+import { CommonModule } from '@angular/common';
+import { AdminDataService } from '../../../service/admin-data.service';
+import { catchError, tap } from 'rxjs/operators';
+import { Observable, throwError } from 'rxjs';
+
+@Component({
+  selector: 'app-student-data',
+  standalone: true,
+  imports: [ReactiveFormsModule, CommonModule],
+  templateUrl: './student-data.component.html',
+  styleUrls: ['./student-data.component.css'],
+})
+export class StudentDataComponent implements OnInit {
+
+  studentDetailsForm!: FormGroup;
+  studentObj: Student = {
+    _id: '',
+    faculty_number: 0,
+    faculty_name: '',
+    joining_year: 0,
+    birth_date: '',
+    department: '',
+    mobile: 0,
+    email: '',
+    password: '',
+  };
+  allFaculties: Student[] = [];
+
+  @ViewChild('staticBackdrop') modal!: ElementRef;
+
+  constructor(private fb: FormBuilder, private dataService: AdminDataService) { }
+
+  ngOnInit(): void {
+    this.initializeForm();
+    this.getAllFaculties();
+  }
+
+  private initializeForm() {
+    this.studentDetailsForm = this.fb.group({
+      faculty_name: ['', [Validators.required]],
+      joining_year: ['', [Validators.required, Validators.min(1900), Validators.max(new Date().getFullYear())]],
+      birth_date: ['', [Validators.required]],
+      department: ['', [Validators.required]],
+      mobile: ['', [Validators.required, Validators.pattern(/^\d{10,13}$/)]],
+      email: ['', [Validators.required, Validators.email]],
+      password: ['', [Validators.required, Validators.minLength(8)]],
+    });
+  }
+
+  addNewFaculty() {
+    if (this.studentDetailsForm.invalid) {
+      Object.keys(this.studentDetailsForm.controls).forEach(field => {
+        const control = this.studentDetailsForm.get(field);
+        control?.markAsTouched({ onlySelf: true });
+      });
+      return;
+    }
+
+    const formValues = this.studentDetailsForm.value;
+    const newFaculty: Student = {
+      ...formValues,
+      faculty_number: this.getFacultyNumber()
+    };
+
+
+    this.dataService.addFaculty(newFaculty).pipe(
+      tap(() => this.studentDetailsForm.reset()),
+      catchError(this.handleError('addFaculty'))
+    ).subscribe({
+      next: () => {
+        this.getAllFaculties();
+        alert('Student added successfully!');
+      },
+      error: () => {
+        alert('Failed to add student. Please try again.');
+      },
+    });
+  }
+  // Error handling method
+  private handleError<T>(operation = 'operation') {
+    return (error: any): Observable<T> => {
+      console.error(`${operation} failed: ${error.message}`);
+      return throwError(() => new Error(`${operation} failed`));
+    };
+  }
+
+
+
+  getAllFaculties() {
+    this.dataService.getAllFaculty().subscribe({
+      next: (res) => {
+        if (res.length === 0) {
+          console.warn('No faculties found.');
+          // Optional: Show a message to the user
+          alert('No faculties found in the database.');
+        } else {
+          console.log('Faculties fetched successfully:', res);
+          this.allFaculties = res;
+        }
+      },
+      error: (err) => {
+        console.error('Error fetching faculties:', err);
+        alert('Failed to fetch faculty details. Please try again later.');
+      },
+    });
+  }
+
+  private getFacultyNumber(): number {
+    return this.allFaculties.length + 1;
+  }
+
+getFaculty(student: Student) {
+  this.studentDetailsForm.patchValue({
+    _id: student._id,
+    faculty_name: student.faculty_name,
+    joining_year: student.joining_year,
+    birth_date: student.birth_date,
+    department: student.department,
+    mobile: student.mobile,
+    email: student.email,
+    password:student.password
+  });
+  console.log(this.studentDetailsForm.valid);
+
+}
+updateFaculty() {
+  if (this.studentDetailsForm.invalid) {
+    Object.keys(this.studentDetailsForm.controls).forEach(field => {
+      const control = this.studentDetailsForm.get(field);
+      control?.markAsTouched({ onlySelf: true });
+    });
+    return;
+  }else{
+    console.log(this.studentDetailsForm.valid);
+
+  }
+
+  const updatedFaculty: Student = {
+    ...this.studentDetailsForm.value,
+    _id: this.studentDetailsForm.get('_id')?.value,
+  };
+  console.log(updatedFaculty);
+  
+
+  this.dataService.updateFaculty(updatedFaculty)
+    .pipe(
+      tap(() => {
+        alert('Student updated successfully');
+        this.getAllFaculties();
+        this.resetForm();
+      }),
+      catchError(this.handleError('updateFaculty'))
+    )
+    .subscribe();
+}
+
+resetForm() {
+  this.studentDetailsForm.reset();
+}
+
+  deleteFaculty(student: Student) {
+    if (window.confirm('Are you sure you want to delete ' + student.faculty_name)) {
+      this.dataService.deleteFaculty(student._id).subscribe(res => {
+        console.log("Student deleted Successfully");
+        this.getAllFaculties();
+
+      }, err => {
+        console.log("Error occured while deleting student");
+
+      })
+    }
+  }
+}

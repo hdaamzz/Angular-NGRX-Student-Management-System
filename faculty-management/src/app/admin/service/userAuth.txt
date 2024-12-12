@@ -1,0 +1,29 @@
+import { isPlatformBrowser } from '@angular/common';
+import { HttpClient } from '@angular/common/http';
+import { Inject, Injectable, PLATFORM_ID } from '@angular/core';
+import { Observable } from 'rxjs';
+
+export interface User{
+  username:string;
+  password:string;
+}
+
+@Injectable({
+  providedIn: 'root'
+})
+export class UserAuthService {
+
+  private baseUrl = 'http://localhost:3000/admin';
+
+  constructor(private http: HttpClient,@Inject(PLATFORM_ID) private platformId: Object) {}
+
+  login(user: User): Observable<any> {
+    return this.http.post(`${this.baseUrl}/login`, user);
+  }
+  isUserloggedIn(): boolean {
+    if (isPlatformBrowser(this.platformId)) {
+      return !!localStorage.getItem("authToken");
+    }
+    return false;
+  }
+}

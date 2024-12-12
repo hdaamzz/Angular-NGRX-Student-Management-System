@@ -1,0 +1,117 @@
+<div id="abc" class="profile-page">
+    <div class="content">
+        <div>
+            <div class="content__cover">
+                <div class=""></div>
+                <div class="content__bull"><span></span><span></span><span></span><span></span><span></span>
+                </div>
+            </div>
+            <div class="content__actions p-3">
+            </div>
+            <div class="content__title">
+                <h1>{{studentData?.faculty_name}}</h1><span>{{studentData?.email}}</span>
+            </div>
+            <div class="content__description">
+                <p>Department : {{studentData?.department}}</p>
+                <p>Joined : {{studentData?.joining_year}}</p>
+                <p>Mobile : {{studentData?.mobile}}</p>
+                <p>Date of birth : {{studentData?.birth_date}}</p>
+            </div>
+            <div class="content__button">
+                <a class="button" data-bs-toggle="modal" data-bs-target="#editModal">
+                    <div class="button__border"></div>
+                    <div class="button__bg"></div>
+                    <p class="button__text">Update</p>
+                </a>
+                &nbsp;
+                <a class="button" (click)="signout()">
+                    <div class="button__border"></div>
+                    <div class="button__bg"></div>
+                    <p class="button__text">Sign out</p>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- edit student -->
+<div class="modal fade" id="editModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+    aria-labelledby="editModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered custom-modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5 text-success" id="editModalLabel">Edit Student</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                    aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form [formGroup]="editForm" (ngSubmit)="onUpdateStudent()">
+                    <div class="mb-3">
+                        <label for="edit-fullname" class="form-label">Full Name</label>
+                        <input type="text" class="form-control" id="edit-fullname" formControlName="faculty_name">
+                        <div *ngIf="editForm.get('faculty_name')?.touched && editForm.get('faculty_name')?.invalid" class="text-danger">
+                            Full Name is required
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="edit-emailaddress" class="form-label">Email address</label>
+                        <input type="email" class="form-control" id="edit-emailaddress" formControlName="email">
+                        <div *ngIf="editForm.get('email')?.touched && editForm.get('email')?.invalid" class="text-danger">
+                            Valid email is required
+                        </div>
+                    </div>
+                    <!-- <div class="mb-3">
+                        <label for="edit-image" class="form-label">Profile Phote</label>
+                        <div class="image-upload-container">
+                            <input type="file" class="image-upload-input" id="productImage1" name="productImage" accept="image/*" onchange="previewImage(this, 'imagePreview1', 1)">
+                            <label for="productImage1" class="image-upload-label errMsgSignup">
+                                <div class="upload-placeholder">
+                                    <i class="fas fa-cloud-upload-alt"></i>
+                                    <span>Click or drag image here</span>
+                                </div>
+                                <img id="imagePreview1" src="#" alt="Preview" class="img-preview">
+                            </label>
+                        </div>
+                    </div> -->
+                    <div class="mb-3">
+                        <label for="edit-joiningdate" class="form-label">Joining Year</label>
+                        <input type="number" class="form-control" id="edit-joiningdate" formControlName="joining_year">
+                        <div *ngIf="editForm.get('joining_year')?.touched && editForm.get('joining_year')?.invalid" class="text-danger">
+                            Joining Year is required
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="edit-department" class="form-label">Department</label>
+                        <input type="text" class="form-control" id="edit-department" formControlName="department">
+                        <div *ngIf="editForm.get('department')?.touched && editForm.get('department')?.invalid" class="text-danger">
+                            Department is required
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="edit-dateofbirth" class="form-label">Date of Birth</label>
+                        <input type="date" class="form-control" id="edit-dateofbirth" formControlName="birth_date">
+                        <div *ngIf="editForm.get('birth_date')?.touched && editForm.get('birth_date')?.invalid" class="text-danger">
+                            Date of Birth is required
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="edit-mobile" class="form-label">Mobile</label>
+                        <input type="text" class="form-control" id="edit-mobile" formControlName="mobile">
+                        <div *ngIf="editForm.get('mobile')?.touched && editForm.get('mobile')?.invalid" class="text-danger">
+                            Valid 10-digit mobile number is required
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="edit-password" class="form-label">Password</label>
+                        <input type="password" class="form-control" id="edit-password" formControlName="password" autocomplete="disabled">
+                        <div *ngIf="editForm.get('password')?.touched && editForm.get('password')?.invalid" class="text-danger">
+                            Password is required
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary" [disabled]="editForm.invalid" data-bs-dismiss="modal">Update Student</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

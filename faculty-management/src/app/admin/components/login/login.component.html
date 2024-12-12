@@ -1,0 +1,31 @@
+
+  <div class="container-fluid flex justify-content-center session">
+    <div class="left">
+      
+    </div>
+    <form [formGroup]="adminLoginData" (ngSubmit)="adminLogin()" class="log-in" autocomplete="off"> 
+      <h4>ADMIN</h4>
+      <p>Welcome back! Log in to your account to view today's clients:</p>
+      <div class="floating-label">
+        <input placeholder="Email" type="email" name="email" id="email" autocomplete="off" formControlName="username">
+        <label for="email">Email:</label>
+       
+      
+
+      </div>
+      <div *ngIf="adminLoginData.get('username')?.invalid && (adminLoginData.get('username')?.dirty || adminLoginData.get('username')?.touched)" class="small text-danger">
+        This is required field
+      </div>
+      <div class="floating-label">
+        <input placeholder="Password" type="password" name="password" id="password" autocomplete="off" formControlName="password">
+        <label for="password">Password:</label>
+       
+        
+      </div>
+      <div *ngIf="adminLoginData.get('password')?.invalid && (adminLoginData.get('password')?.dirty || adminLoginData.get('password')?.touched)" class="small text-danger">
+        This is required field
+      </div>
+      <button type="submit" [disabled]="adminLoginData.invalid">Log in</button>
+      <!-- <a href="https://codepen.io/elujambio/pen/yjwzGP" class="discrete" target="_blank">Basic version</a> -->
+    </form>
+  </div>
