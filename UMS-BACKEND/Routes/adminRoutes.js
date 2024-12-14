@@ -53,7 +53,10 @@ router.post('/login', async (req, res) => {
 
 router.get('/student', async (req, res) => {
   try {
+
     const students = await Student.find(); 
+    
+    
     if (students.length === 0) {
       return res.status(200).json([]);
     }
@@ -105,7 +108,7 @@ router.put('/user/:_id', auth, async (req, res) => {
       return res.status(404).json({ message: 'Student not found' });
     }
 
-    // Destructure and validate fields
+    
     const {
       faculty_name,
       email,
@@ -116,7 +119,7 @@ router.put('/user/:_id', auth, async (req, res) => {
       password
     } = req.body;
 
-    // Comprehensive validation
+    
     const validationErrors = [];
 
     if (!faculty_name || faculty_name.trim().length < 2) 
@@ -158,12 +161,12 @@ router.put('/user/:_id', auth, async (req, res) => {
     existingStudent.department = department;
     existingStudent.birth_date = birth_date;
     existingStudent.mobile = mobile;
-    existingStudent.password = password; // Ensure password is hashed in production
+    existingStudent.password = password; 
 
     const updatedStudent = await existingStudent.save();
     
     const studentResponse = updatedStudent.toObject();
-    delete studentResponse.password; // Do not return password in response
+    delete studentResponse.password; 
 
     res.status(200).json(studentResponse);
   } catch (error) {
@@ -197,6 +200,8 @@ router.delete('/student/:id', async (req, res) => {
 router.get('/student-details',auth,async(req,res)=>{
   try {
     const student = await Student.findById(req.user.id);
+    console.log(student);
+    
     if (!student) {
       return res.status(404).json({ message: 'Student not found' });
     }

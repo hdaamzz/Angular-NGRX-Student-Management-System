@@ -1,6 +1,6 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Inject, Injectable, PLATFORM_ID } from '@angular/core';
-import { Observable, of } from 'rxjs';
+import { catchError, Observable, of, throwError } from 'rxjs';
 import { Student } from '../../model/student';
 import { isPlatformBrowser } from '@angular/common';
 
@@ -11,33 +11,59 @@ export class StudentService {
   private backUrl='http://localhost:3000/admin'
 
   constructor(private http:HttpClient,@Inject(PLATFORM_ID) private platformId: Object) { }
-
-  getStudentDetails():Observable<Student>{
+  getStudentDetails(): Observable<Student | null> {
+    
     if (!isPlatformBrowser(this.platformId)) {
-      
-      return of(null as any);
+      console.warn('Not running in browser');
+      return of(null);
     }
-    const token = localStorage.getItem('authToken');
-    
-    const headers=new HttpHeaders({
-      'Authorization':`Bearer ${token}`
-    })
-    return this.http.get<Student>(`${this.backUrl}/student-details`, { headers })
-  }
 
-  updateStudentProfile(studentData: any): Observable<Student> {
-    console.log("service hit", studentData);
     
-    const token = localStorage.getItem('authToken');
+    const token = typeof window !== 'undefined' ? localStorage.getItem('authToken') : null;
+    
+    if (!token) {
+      console.warn('No authentication token found');
+      return of(null);
+    }
+
+    const headers = new HttpHeaders({ 
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    });
+
+    return this.http.get<Student>(`${this.backUrl}/student-details`, { headers }).pipe(
+      catchError(error => {
+        console.error('Error fetching student details:', error);
+        return of(null);
+      })
+    );
+  }
+  updateStudentProfile(studentData: any): Observable<Student | null> {
+    
+    if (!isPlatformBrowser(this.platformId)) {
+      console.warn('Not running in browser');
+      return of(null);
+    }
+
+    
+    const token = typeof window !== 'undefined' ? localStorage.getItem('authToken') : null;
+    
+    if (!token) {
+      console.warn('No authentication token found');
+      return of(null);
+    }
+
     const headers = new HttpHeaders({
       'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json' // Change to JSON
+      'Content-Type': 'application/json'
     });
-  
-    // Use HTTP body directly instead of FormData
-    return this.http.put<Student>(`${this.backUrl}/user/${studentData._id}`, studentData, { 
-      headers 
-    });
+
+    return this.http.put<Student>(`${this.backUrl}/user/${studentData._id}`, studentData, { headers }).pipe(
+      catchError(error => {
+        console.error('Error updating student profile:', error);
+        return of(null);
+      })
+    );
   }
 
 

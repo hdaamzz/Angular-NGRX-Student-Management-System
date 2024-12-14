@@ -16,13 +16,4 @@ app.use(cors({
     allowedHeaders: ['Content-Type', 'Authorization']
   }));
 app.use('/admin',adminRoutes)
-
-
-
-
-app.use(cors({origin:'http://localhost:4200'}))
-
-
-
-
 module.exports=app
