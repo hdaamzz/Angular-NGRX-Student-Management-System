@@ -80,7 +80,7 @@ export class UserHomeComponent implements OnInit{
       ).subscribe({
         next: (error) => {
           console.error('Student data error:', error);
-          this.toastr.error(error || 'Error loading profile', 'Error');
+          // this.toastr.error(error || 'Error loading profile', 'Error');
         }
       })
     );

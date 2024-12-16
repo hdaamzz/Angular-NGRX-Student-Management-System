@@ -8,13 +8,13 @@
                     </div>
                 </div>
                 <div class="content__actions p-3">
-                    <!-- Loading indicator -->
+                    
                     <div *ngIf="loading$ | async" class="text-center">
                         <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
                         Loading...
                     </div>
 
-                    <!-- Error handling -->
+                   
                     <div *ngIf="error$ | async as error" class="alert alert-danger">
                         {{ error }}
                     </div>

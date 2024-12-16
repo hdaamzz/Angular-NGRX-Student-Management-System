@@ -14,7 +14,7 @@ export class StudentService {
   getStudentDetails(): Observable<Student | null> {
     
     if (!isPlatformBrowser(this.platformId)) {
-      console.warn('Not running in browser');
+      console.log('Not running in browser');
       return of(null);
     }
 

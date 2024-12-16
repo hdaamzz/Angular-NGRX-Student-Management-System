@@ -5,6 +5,9 @@
     <div class="col-sm-2 bg-light sidebar pe-0 p-3">
       <a class="p-3 text-success text-center "><strong>Home</strong></a>
       <hr class="text-success">
+      <a *ngIf="studentData$ | async as studentData;" class=" text-dark text-center ">{{studentData.faculty_name}}</a>
+      <hr class="text-warning">
+
 
       <a class="p-3">
         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-person"

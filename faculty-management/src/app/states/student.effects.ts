@@ -28,13 +28,15 @@ export class StudentEffects {
             if (student) {
               console.log('Loaded student details:', student);
               return StudentActions.loadStudentDetailsSuccess({ student });
-            } else {
-              console.warn('No student data found');
+            } 
+            else {
+              console.log('No student data found');
               return StudentActions.loadStudentDetailsFailure({ 
-                error: 'No student data available' 
+                error:"" 
               });
             }
-          }),
+          }
+        ),
           catchError(error => {
             console.error('Error loading student details:', error);
             return of(StudentActions.loadStudentDetailsFailure({
