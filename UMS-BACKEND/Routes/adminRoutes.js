@@ -4,7 +4,9 @@ const router = express.Router();
 const jwt = require('jsonwebtoken');
 const mongoType = require('mongoose').Types;
 const auth = require('../middleware/auth')
-
+const upload = require('../middleware/uploadMiddleware');
+const path = require('path');
+const fs = require('fs');
 
 const JWT_SECRET = 'itsNotAtoken'; 
 
@@ -96,85 +98,113 @@ router.put('/student/:id', async (req, res) => {
 
 });
 
-router.put('/user/:_id', auth, async (req, res) => {
+router.put('/user/:_id', auth, upload.single('profileImage'), async (req, res) => {
   try {
-    const { _id } = req.params;
-    console.log("Received update request for ID:", _id);
-    console.log("Request Body:", req.body);
+      const { _id } = req.params;
+      console.log("Received update request for ID:", _id);
+      console.log("Request Body:", req.body);
+      console.log("Uploaded File:", req.file);
 
-    const existingStudent = await Student.findById(_id);
-    
-    if (!existingStudent) {
-      return res.status(404).json({ message: 'Student not found' });
-    }
+      const existingStudent = await Student.findById(_id);
+      
+      if (!existingStudent) {
+          return res.status(404).json({ message: 'Student not found' });
+      }
 
-    
-    const {
-      faculty_name,
-      email,
-      joining_year,
-      department,
-      birth_date,
-      mobile,
-      password
-    } = req.body;
+     
+      const {
+          faculty_name,
+          email,
+          joining_year,
+          department,
+          birth_date,
+          mobile,
+          password
+      } = req.body;
 
-    
-    const validationErrors = [];
+     
+      const validationErrors = [];
 
-    if (!faculty_name || faculty_name.trim().length < 2) 
-      validationErrors.push('Valid Full Name is required');
-    
-    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) 
-      validationErrors.push('Valid Email is required');
-    
-    if (!joining_year || joining_year < 1900 || joining_year > new Date().getFullYear()) 
-      validationErrors.push('Valid Joining Year is required');
-    
-    if (!department || department.trim().length < 2) 
-      validationErrors.push('Valid Department is required');
-    
-    if (!birth_date) 
-      validationErrors.push('Birth Date is required');
-    
-    if (!mobile || !/^\d{10}$/.test(mobile)) validationErrors.push('Valid Mobile Number is required');
-    
-    if (!password || password.length < 8) 
-      validationErrors.push('Password must be at least 8 characters long');
+      if (!faculty_name || faculty_name.trim().length < 2) 
+          validationErrors.push('Valid Full Name is required');
+      
+      if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) 
+          validationErrors.push('Valid Email is required');
+      
+      if (!joining_year || joining_year < 1900 || joining_year > new Date().getFullYear()) 
+          validationErrors.push('Valid Joining Year is required');
+      
+      if (!department || department.trim().length < 2) 
+          validationErrors.push('Valid Department is required');
+      
+      if (!birth_date) 
+          validationErrors.push('Birth Date is required');
+      
+      if (!mobile || !/^\d{10}$/.test(mobile)) 
+          validationErrors.push('Valid Mobile Number is required');
+      
+      if (!password || password.length < 8) 
+          validationErrors.push('Password must be at least 8 characters long');
 
-    if (validationErrors.length > 0) {
-      return res.status(400).json({ message: validationErrors.join(', ') });
-    }
+      if (validationErrors.length > 0) {
+          if (req.file) {
+              fs.unlinkSync(req.file.path);
+          }
+          return res.status(400).json({ message: validationErrors.join(', ') });
+      }
 
-    const emailExists = await Student.findOne({ 
-      email, 
-      _id: { $ne: _id } 
-    });
+     
+      const emailExists = await Student.findOne({ 
+          email, 
+          _id: { $ne: _id } 
+      });
 
-    if (emailExists) {
-      return res.status(400).json({ message: 'Email already in use' });
-    }
+      if (emailExists) {
+         
+          if (req.file) {
+              fs.unlinkSync(req.file.path);
+          }
+          return res.status(400).json({ message: 'Email already in use' });
+      }
 
-    existingStudent.faculty_name = faculty_name;
-    existingStudent.email = email;
-    existingStudent.joining_year = joining_year;
-    existingStudent.department = department;
-    existingStudent.birth_date = birth_date;
-    existingStudent.mobile = mobile;
-    existingStudent.password = password; 
+      
+      if (req.file) {
+          
+          if (existingStudent.profileImage) {
+              const oldImagePath = path.join(__dirname, '../uploads/profiles', existingStudent.profileImage);
+              if (fs.existsSync(oldImagePath)) {
+                  fs.unlinkSync(oldImagePath);
+              }
+          }
+          
+          
+          existingStudent.profileImage = req.file.filename;
+      }
 
-    const updatedStudent = await existingStudent.save();
-    
-    const studentResponse = updatedStudent.toObject();
-    delete studentResponse.password; 
+      
+      existingStudent.faculty_name = faculty_name;
+      existingStudent.email = email;
+      existingStudent.joining_year = joining_year;
+      existingStudent.department = department;
+      existingStudent.birth_date = birth_date;
+      existingStudent.mobile = mobile;
+      existingStudent.password = password; 
 
-    res.status(200).json(studentResponse);
+      const updatedStudent = await existingStudent.save();
+      
+      const studentResponse = updatedStudent.toObject();
+      delete studentResponse.password; 
+
+      res.status(200).json(studentResponse);
   } catch (error) {
-    console.error("Error occurred while updating student:", error);
-    res.status(500).json({ message: 'Internal server error' });
+      console.error("Error occurred while updating student:", error);
+     
+      if (req.file) {
+          fs.unlinkSync(req.file.path);
+      }
+      res.status(500).json({ message: 'Internal server error' });
   }
 });
-
 
 router.delete('/student/:id', async (req, res) => {
   try {
@@ -194,6 +224,18 @@ router.delete('/student/:id', async (req, res) => {
 
   } catch (error) {
     console.log("Error occured while deleting student " + error);
+  }
+});
+
+router.get('/profile-image/:filename', (req, res) => {
+  const filename = req.params.filename;
+  const filePath = path.join(__dirname, '../uploads/profiles', filename);
+  
+  
+  if (fs.existsSync(filePath)) {
+      res.sendFile(filePath);
+  } else {
+      res.status(404).json({ message: 'Image not found' });
   }
 });
 

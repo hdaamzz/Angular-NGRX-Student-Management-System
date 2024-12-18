@@ -16,38 +16,54 @@ import { filter, take } from 'rxjs/operators';
 @Component({
   selector: 'app-user-home',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule,AsyncPipe],
+  imports: [CommonModule, ReactiveFormsModule, AsyncPipe],
   providers: [provideAnimations()],
   templateUrl: './user-home.component.html',
   styleUrl: './user-home.component.css'
 })
-export class UserHomeComponent implements OnInit{
+export class UserHomeComponent implements OnInit {
 
   editForm!: FormGroup;
-  
+  selectedFile: File | null = null;
+  previewImage: string | ArrayBuffer | null = null;
   studentData$: Observable<Student | null>;
   loading$: Observable<boolean>;
   error$: Observable<string | null>;
+  profileImageUrl: string | null = null;
 
   private subscriptions: Subscription[] = [];
   constructor(
-    private store: Store, 
-    private router: Router, 
-    private studentService: StudentService, 
-    private fb: FormBuilder, 
+    private store: Store,
+    private router: Router,
+    private studentService: StudentService,
+    private fb: FormBuilder,
     private toastr: ToastrService
-  ) { 
+  ) {
     this.createForm();
-    
-    
+
+
     this.studentData$ = this.store.select(selectStudent);
     this.loading$ = this.store.select(selectStudentLoading);
     this.error$ = this.store.select(selectStudentError);
   }
 
+  onFileSelected(event: any) {
+    const file = event.target.files[0];
+    if (file) {
+      this.selectedFile = file;
+
+      
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        this.previewImage = e.target?.result || null;
+      };
+      reader.readAsDataURL(file);
+    }
+  }
+
   ngOnInit(): void {
     this.StudentDetails();
-  
+
     this.subscriptions.push(
       this.studentData$.pipe(
         filter(student => !!student)
@@ -63,32 +79,45 @@ export class UserHomeComponent implements OnInit{
           this.toastr.error('Failed to load student data', 'Error');
         }
       }),
-      
+
       this.loading$.subscribe({
         next: (loading) => {
           if (!loading) {
-            // this.toastr.success('Profile Loaded successfully!', 'Loaded');
           }
         },
         error: (err) => {
           console.error('Loading error', err);
         }
       }),
-      
+
       this.error$.pipe(
         filter(error => !!error)
       ).subscribe({
         next: (error) => {
           console.error('Student data error:', error);
-          // this.toastr.error(error || 'Error loading profile', 'Error');
+
+        }
+      })
+    );
+
+    this.subscriptions.push(
+      this.studentData$.pipe(
+        filter(student => !!student)
+      ).subscribe({
+        next: (student) => {
+          if (student) {
+            console.log(' Student data loaded:', student);
+            this.editForm.patchValue(student);
+            this.profileImageUrl = student.profileImage ? this.studentService.getProfileImageUrl(student.profileImage) : null; // Set profile image URL
+          }
+        },
+        error: (err) => {
+          console.error('Error loading student data', err);
+          this.toastr.error('Failed to load student data', 'Error');
         }
       })
     );
   }
-  // ngOnDestroy(): void {
-  //   // Unsubscribe from all subscriptions
-  //   this.subscriptions.forEach(sub => sub.unsubscribe());
-  // }
 
   StudentDetails() {
     this.store.dispatch(StudentActions.loadStudentDetails());
@@ -109,35 +138,43 @@ export class UserHomeComponent implements OnInit{
 
   onUpdateStudent() {
     this.editForm.markAllAsTouched();
-  
+
     if (this.editForm.valid) {
       const formValue = { ...this.editForm.value };
-  
+
+     
+      const formData = new FormData();
+
+      
+      Object.keys(formValue).forEach(key => {
+        formData.append(key, formValue[key]);
+      });
+
+      
+      if (this.selectedFile) {
+        formData.append('profileImage', this.selectedFile, this.selectedFile.name);
+      }
+
       if (!formValue._id) {
         const currentStudent = this.studentData$.pipe(take(1));
         currentStudent.subscribe(student => {
           if (student && student._id) {
-            formValue._id = student._id;
-            this.updateProfile(formValue);
+            formData.set('_id', student._id);
+            this.updateProfile(formData);
           } else {
             this.toastr.error('Unable to update profile: Missing ID', 'Error');
           }
         });
       } else {
-        this.updateProfile(formValue);
+        this.updateProfile(formData);
       }
     } else {
       this.collectFormValidationErrors();
     }
   }
-  
-  private updateProfile(formValue: any) {
-    if (formValue.birth_date) {
-      formValue.birth_date = this.formatDate(formValue.birth_date);
-    }
-  
-    
-    this.store.dispatch(StudentActions.updateStudentProfile({ studentData: formValue }));
+
+  private updateProfile(formData: FormData) {
+    this.store.dispatch(StudentActions.updateStudentProfile({ studentData: formData }));
   }
 
 

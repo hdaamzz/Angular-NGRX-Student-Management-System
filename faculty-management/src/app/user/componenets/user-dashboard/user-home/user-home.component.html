@@ -28,6 +28,8 @@
                     <p>Joined : {{studentData.joining_year}}</p>
                     <p>Mobile : {{studentData.mobile}}</p>
                     <p>Date of birth : {{studentData.birth_date | date:'mediumDate'}}</p>
+                    <img *ngIf="profileImageUrl" [src]="profileImageUrl" class="img-thumbnail" style="max-width: 150px;">
+
                 </div>
                 <div class="content__button">
                     <a class="button" data-bs-toggle="modal" data-bs-target="#editModal">
@@ -91,6 +93,17 @@
                             class="text-danger">
                             Joining Year is required
                         </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="profileImage" class="form-label">Profile Image</label>
+                        <input 
+                            type="file" 
+                            class="form-control" 
+                            id="profileImage" 
+                            (change)="onFileSelected($event)"
+                            accept="image/*"
+                        >
+                        <img *ngIf="previewImage" [src]="previewImage" class="img-thumbnail mt-2" style="max-width: 200px;">
                     </div>
                     <div class="mb-3">
                         <label for="edit-department" class="form-label">Department</label>

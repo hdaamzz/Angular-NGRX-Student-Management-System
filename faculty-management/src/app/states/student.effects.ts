@@ -47,28 +47,27 @@ export class StudentEffects {
       )
     )
   );
-  
   updateStudentProfile$ = createEffect(() =>
     this.actions$.pipe(
-      ofType(StudentActions.updateStudentProfile),
-      switchMap(action => 
-        this.userService.updateStudentProfile(action.studentData).pipe(
-          map(student => {
-            if (student) {
-              this.toastr.success('Profile Updated Successfully', 'Success');
-              return StudentActions.updateStudentProfileSuccess({ student });
-            } else {
-              this.toastr.error('Failed to update profile', 'Error');
-              return StudentActions.updateStudentProfileFailure({
-                error: 'Failed to update student profile'
-              });
-            }
-          }),
-          catchError(error => of(StudentActions.updateStudentProfileFailure({
-            error: error?.message || 'Failed to update student profile'
-          })))
+        ofType(StudentActions.updateStudentProfile),
+        switchMap(action => 
+            this.userService.updateStudentProfile(action.studentData).pipe(
+                map(student => {
+                    if (student) {
+                        this.toastr.success('Profile Updated Successfully', 'Success');
+                        return StudentActions.updateStudentProfileSuccess({ student });
+                    } else {
+                        this.toastr.error('Failed to update profile', 'Error');
+                        return StudentActions.updateStudentProfileFailure({
+                            error: 'Failed to update student profile'
+                        });
+                    }
+                }),
+                catchError(error => of(StudentActions.updateStudentProfileFailure({
+                    error: error?.message || 'Failed to update student profile'
+                })))
+            )
         )
-      )
     )
-  );
+);
 }

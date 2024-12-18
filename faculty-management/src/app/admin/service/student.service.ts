@@ -8,25 +8,25 @@ import { isPlatformBrowser } from '@angular/common';
   providedIn: 'root'
 })
 export class StudentService {
-  private backUrl='http://localhost:3000/admin'
+  private backUrl = 'http://localhost:3000/admin'
 
-  constructor(private http:HttpClient,@Inject(PLATFORM_ID) private platformId: Object) { }
+  constructor(private http: HttpClient, @Inject(PLATFORM_ID) private platformId: Object) { }
   getStudentDetails(): Observable<Student | null> {
-    
+
     if (!isPlatformBrowser(this.platformId)) {
       console.log('Not running in browser');
       return of(null);
     }
 
-    
+
     const token = typeof window !== 'undefined' ? localStorage.getItem('authToken') : null;
-    
+
     if (!token) {
       console.warn('No authentication token found');
       return of(null);
     }
 
-    const headers = new HttpHeaders({ 
+    const headers = new HttpHeaders({
       'Authorization': `Bearer ${token}`,
       'Content-Type': 'application/json'
     });
@@ -38,32 +38,32 @@ export class StudentService {
       })
     );
   }
-  updateStudentProfile(studentData: any): Observable<Student | null> {
-    
+  updateStudentProfile(studentData: FormData): Observable<Student | null> {
     if (!isPlatformBrowser(this.platformId)) {
       console.warn('Not running in browser');
       return of(null);
     }
 
-    
     const token = typeof window !== 'undefined' ? localStorage.getItem('authToken') : null;
-    
+
     if (!token) {
       console.warn('No authentication token found');
       return of(null);
     }
 
     const headers = new HttpHeaders({
-      'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json'
+      'Authorization': `Bearer ${token}`
     });
 
-    return this.http.put<Student>(`${this.backUrl}/user/${studentData._id}`, studentData, { headers }).pipe(
+    return this.http.put<Student>(`${this.backUrl}/user/${studentData.get('_id')}`, studentData, { headers }).pipe(
       catchError(error => {
         console.error('Error updating student profile:', error);
         return of(null);
       })
     );
+  }
+  getProfileImageUrl(filename: string): string {
+    return `http://localhost:3000/admin/profile-image/${filename}`;
   }
 
 

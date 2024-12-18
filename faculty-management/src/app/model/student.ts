@@ -8,4 +8,5 @@ export interface Student {
     mobile:number;
     email:string;
     password:string;
+    profileImage?: string; 
 }

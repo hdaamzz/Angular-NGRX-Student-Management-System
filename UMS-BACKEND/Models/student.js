@@ -9,6 +9,7 @@ const Student = mongoose.model('Students', {
     mobile: { type: Number },
     email: { type: String },
     password: { type: String },
+    profileImage: { type: String, default: '' } 
 });
 
 module.exports = Student;

@@ -16,7 +16,7 @@ export const loadStudentDetailsFailure = createAction(
 
 export const updateStudentProfile = createAction(
   '[Student] Update Profile',
-  props<{ studentData: any }>()
+  props<{ studentData: FormData }>()
 );
 export const updateStudentProfileSuccess = createAction(
   '[Student] Update Profile Success',
